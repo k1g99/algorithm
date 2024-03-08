@@ -1,7 +1,0 @@
-### for C++
-# Ignore all
-*
-
-# Unignore only cpp files
-!*.cpp
-!*/
