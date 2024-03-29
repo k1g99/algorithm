@@ -1,4 +1,5 @@
 
+## 모든 경우의 수를 다 찾는 거!! -> 굳이 queue 써가면서 원소가 3개만 있는지 확인할 필요 없음! 
 
 import heapq
 from collections import deque
@@ -6,91 +7,73 @@ from itertools import combinations
 
 T = int(input())
 
+def cal_dist(a, b):
+    t1 = abs(a[0] - b[0])
+    t2 = abs(a[1] - b[1])
+    return t1 + t2
 
-def get_dist(s1, s2):
-    a = abs(s1[0] - s2[0])
-    b = abs(s1[1] - s2[1])
-    return a + b
-
-# 여러개의 테스트 케이스가 주어지므로, 각각을 처리합니다.
 for test_case in range(1, T + 1):
+    ans = 9999
     N = int(input())
+
+    p_cor = []
+    p_dist = []
+    s_cor = []
+    s_dep = []
     room = []
-    stairs_cor = [] # [row, col, 깊이]
-    people_cor = [] # [row, col]
-    people_a = []  # [[stairA 까지 거리]]
-    people_b = []  # [[stairB 까지 거리]]
-
-    answer = 999999
-
     for r in range(N):
         row = list(map(int, input().split()))
         room.append(row)
         for c in range(N):
-            if(row[c] == 1): # 사람 찾기
-                people_cor.append([r,c])
-            elif(row[c] > 1): # 계단찾기
-                stairs_cor.append([r,c, row[c]])
+            if (row[c] == 1):
+                p_cor.append([r,c])
+            elif(row[c] > 1):
+                s_cor.append([r,c])
 
-    stair_a = stairs_cor[0][2]
-    stair_b = stairs_cor[1][2]
-    for p in people_cor:
-        people_a.append(get_dist(stairs_cor[0], p))
-        people_b.append(get_dist(stairs_cor[1], p))
+    for p in p_cor:
+        p_dist.append([cal_dist(p, s_cor[0]), cal_dist(p, s_cor[1])])
 
-    # 모든 조합 다 해보기
+    # print(s_cor)
+    for sc in s_cor:
+        s_dep.append(room[sc[0]][sc[1]])
+
+    p_num = len(p_cor)
     comb = []
-    people_num = len(people_cor)
-    for i in range(0, people_num + 1):
-        comb.append(list(combinations(range(len(people_cor)), i)))
-
-    for cc in comb:
-        for c in cc:
-            arrive_a_pq = [] # [거리, 사람번호]
-            arrive_b_pq = []
-            for i in range(people_num):
-                if (i in c): # A 계단으로
-                    heapq.heappush(arrive_a_pq, [people_a[i], i])
-                else : # B 계단으로
-                    heapq.heappush(arrive_b_pq, [people_b[i], i])
+    for i in range(p_num+1):
+        temp = list(combinations(range(p_num), i))
+        for t in temp:
+            comb.append(t)
 
 
-            stair_a_que = deque() # [나오는 시간, Idx]
-            stair_b_que = deque()
-            h = 1
-            while (arrive_a_pq or arrive_b_pq):
-                # 계단 탈출 시켜추기
-                while (stair_a_que and stair_a_que[0][0] == h):
-                    stair_a_que.popleft()
-                while (stair_b_que and stair_b_que[0][0] == h):
-                    stair_b_que.popleft()
+    for c in comb:
+        arrive = [[], []]
+        for i in range(p_num):
+            if(i in c):
+                arrive[0].append(p_dist[i][0] + s_dep[0])
+            else:
+                arrive[1].append(p_dist[i][1] + s_dep[1])
 
-                # a
-                while(arrive_a_pq and arrive_a_pq[0][0] == h): # hour 시간에 도착한 사람들에 대해서
-                    top = heapq.heappop(arrive_a_pq)
-                    if(len(stair_a_que) < 3): # stair 가 비어있으면 추가
-                        stair_a_que.append([top[0] + stair_a, top[1]])
-                    else:
-                        top = [top[0] + 1, top[1]] # 아니면 +1 해서 다시 대기
-                        heapq.heappush(arrive_a_pq, top)
+        arrive[0].sort()
+        arrive[1].sort()
 
-                # b
-                while (arrive_b_pq and arrive_b_pq[0][0] == h):  # hour 시간에 도착한 사람들에 대해서
-                    top = heapq.heappop(arrive_b_pq)
-                    if (len(stair_b_que) < 3):  # stair 가 비어있으면 추가
-                        stair_b_que.append([top[0] + stair_b, top[1]])
-                    else:
-                        top = [top[0] + 1, top[1]]  # 아니면 +1 해서 다시 대기
-                        heapq.heappush(arrive_b_pq, top)
+        len0 = len(arrive[0])
+        len1 = len(arrive[1])
+        if (len0 > 3):
+            for i in range(3, len0):
+                arrive[0][i] = max(arrive[0][i - 3] + s_dep[0], arrive[0][i])
 
-                h += 1
-            while (stair_a_que):
-                hh = stair_a_que.popleft()
-                h = max(hh[0], h)
-            while (stair_b_que):
-                hh = stair_b_que.popleft()
-                h = max(hh[0], h)
+        if (len1 > 3):
+            for i in range(3, len1):
+                arrive[1][i] = max(arrive[1][i - 3] + s_dep[1], arrive[1][i])
 
-            answer = min(h, answer)
+        m = 0
+        if (arrive[0]):
+            m = max(m, arrive[0][-1])
+        if (arrive[1]):
+            m = max(m, arrive[1][-1])
 
-    print(f"#{test_case} {answer+1}")
+        ans = min(ans, m)
+
+    print(f"#{test_case} {ans + 1}")
+
+
