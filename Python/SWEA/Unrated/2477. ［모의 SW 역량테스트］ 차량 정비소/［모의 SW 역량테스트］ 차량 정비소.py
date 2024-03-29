@@ -1,73 +1,57 @@
-
+# time 순으로 진행된다고, for문으로 하나하나 따질 필요 없음!!! (99% 는 다른 (효율적인)방법이 있음)
 
 import heapq as hq
 
 T = int(input())
 for test_case in range(1, T + 1):
-    answer = 0
+    answer = -1
 
-    # A 접수 / B 정비 / K 사람 수
-    A, B, K, targetA, targetB = list(map(int, input().split()))
-    a_time = list(map(int, input().split()))
-    b_time = list(map(int, input().split()))
-    arrive = list(map(int, input().split()))
-    count = [[0 for i in range(B)] for j in range(A)]
+    a_num, b_num, K, TAR_A, TAR_B = list(map(int, input().split()))
+    a_delay = list(map(int, input().split()))
+    b_delay = list(map(int, input().split()))
+    p_arrive = list(map(int, input().split()))
 
-    a_wait_pq = [] # 접수 대기자 ([ID])
-    b_wait_pq = [] # 정비 대기자 ([대기 시작 시간, 접수창구, ID])
-    a_pq = [i for i in range(A)] # 남아있는 접수 창구 pop해줌
-    hq.heapify(a_pq)
-    b_pq = [i for i in range(B)] # 남아있는 정비 창구 pop해줌
-    hq.heapify(b_pq)
-    a = [[-1, -1] for _ in range(A)] # [[시간, ID]]
-    b = [[-1, -1, -1] for _ in range(B)] # [[시간, ID, 접수 창구]]
+    people = [] # people : [[시작시간, id], ]
+    for i in range(K):
+        people.append([p_arrive[i], i])
+    people.sort()
 
-    user_id = 0
-    out_user = 0
-    for t in range(30000000):
-        if(out_user >= K): break
+    # 접수 이후 시간 계산
+    people_a = [] # people_a : [[끝시간, 창구번호, id], ]
+    a_start_time = [0] * a_num
+    for p_time, p_id in people:
+        a_id = -1
+        if(p_time >= max(a_start_time)): a_id = 0
+        elif(p_time < min(a_start_time)):
+            for a_id in range(a_num):
+                if(a_start_time[a_id] == min(a_start_time)):
+                    break
+        else:
+            for a_id in range(a_num):
+                if(a_start_time[a_id] <= p_time):
+                    break
+        t = max(p_time, a_start_time[a_id]) + a_delay[a_id]
+        a_start_time[a_id] = t
+        people_a.append([t, a_id, p_id])
+    people_a.sort()
 
-        # 접수 대기 채우기
-        while(user_id < K and arrive[user_id] == t):
-            hq.heappush(a_wait_pq, user_id) # 고객번호가 낮은 순서대로
-            user_id += 1
+    b_start_time = [0] * b_num
+    count = [[0 for _ in range(b_num)] for _ in range(a_num)]
 
-        # 접수 창구 정리
-        for ai in range(A):
-            # 접수 -1씩
-            if(a[ai][0] > 0):
-                a[ai][0] -= 1
+    for p_time, a_id, p_id in people_a:
+        b_id = -1
+        if(p_time >= max(b_start_time)): b_id = 0
+        elif (p_time < min(b_start_time)):
+            for b_id in range(b_num):
+                if (b_start_time[b_id] == min(b_start_time)):
+                    break
+        else:
+            for b_id in range(b_num):
+                if(b_start_time[b_id] <= p_time):
+                    break
+        t = max(p_time, b_start_time[b_id]) + b_delay[b_id]
+        b_start_time[b_id] = t
+        count[a_id][b_id] += p_id + 1
 
-        for ai in range(A):
-            # 접수 -> 정비 대기로 채우기
-            if(a[ai][0] == 0):
-                hq.heappush(b_wait_pq, [t, ai, a[ai][1]]) # 먼저 기다리는 고객이 우선 -> 접수 창구번호가 작은 고객이 우선
-                hq.heappush(a_pq, ai)
-                a[ai] = [-1,-1]
-        # 접수 대기 -> 접수 이동
-        while(a_wait_pq and a_pq):
-            a_changu = hq.heappop(a_pq)
-            a_person = hq.heappop(a_wait_pq)
-            a[a_changu] = [a_time[a_changu], a_person]
-
-        for bi in range(B):
-            # 정비 -1 씩
-            if(b[bi][0] > 0):
-                b[bi][0] -= 1
-
-        for bi in range(B):
-            # 정비 완료 -> count 작성
-            if (b[bi][0] == 0):
-                count[b[bi][2]][bi] += (b[bi][1] + 1)
-                out_user += 1
-                hq.heappush(b_pq, bi)
-                b[bi] = [-1, -1, -1]
-        # 정비 대기 -> 정비 이동
-        while(b_wait_pq and b_pq):
-            b_changu = hq.heappop(b_pq)
-            _, ai, b_person = hq.heappop(b_wait_pq)
-            b[b_changu] = [b_time[b_changu], b_person, ai]
-
-    answer = count[targetA - 1][targetB - 1]
-    if(answer == 0): answer = -1
+    if(count[TAR_A-1][TAR_B-1]): answer = count[TAR_A-1][TAR_B-1]
     print(f"#{test_case} {answer}")
