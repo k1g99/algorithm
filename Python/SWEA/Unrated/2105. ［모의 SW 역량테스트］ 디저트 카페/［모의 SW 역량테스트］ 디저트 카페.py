@@ -1,4 +1,5 @@
-
+# 추가 Tip ! 다른 문제들 푼 거 보니까, 1) DFS 아니더라도 가장 긴 length 인 경우부터 찾아서 내려오는 방법도 있음 
+# 2) boundary 계산해서 True/False 넘겨주는 거 말고도 애초에 boundary를 넘어가지 못하도록 찾는 방법도 있음
 
 T = int(input())
 
