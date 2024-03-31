@@ -57,28 +57,28 @@ for test_case in range(1, T + 1):
                 dfs(n, ['r'], s)
 
     for start, path, sets in check_paths:
-        path = path[:-1]
-        isTrue = True
-        for p in path:
-            di = 2
-            if(p == 'l'):
-                di = 3
-            nxt = [start[0] + dir[di][0], start[1] + dir[di][1]]
-            if(check_border(nxt)):
-                bef = len(sets)
-                # print(start, bef, nxt, sets)
-                sets.add(cafe[nxt[0]][nxt[1]])
-                if(bef + 1 != len(sets)):
+        if(answer // 2 + 1 < len(sets)):
+            path = path[:-1]
+            isTrue = True
+            for p in path:
+                di = 2
+                if(p == 'l'):
+                    di = 3
+                nxt = [start[0] + dir[di][0], start[1] + dir[di][1]]
+                if(check_border(nxt)):
+                    bef = len(sets)
+                    # print(start, bef, nxt, sets)
+                    sets.add(cafe[nxt[0]][nxt[1]])
+                    if(bef + 1 != len(sets)):
+                        isTrue = False
+                        break
+                    start = nxt
+                else:
                     isTrue = False
                     break
-                start = nxt
-            else:
-                isTrue = False
-                break
 
-        if(isTrue):
-            answer = max(answer, len(sets))
-            # print(answer)
+            if(isTrue):
+                answer = max(answer, len(sets))
 
 
 
