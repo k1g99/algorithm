@@ -12,19 +12,19 @@ def check(cov):
 
     for c in range(C):
         find_from_col = False
-        que = deque()
         r = 0
+        s = 0
         for k in range(K):
-            que.append(cov[r][c])
+            s += cov[r][c]
             r += 1
-        if(not(0 in que and 1 in que)): # 연속된 3개 찾으면,
+        if(s == 0 or s == K): # 연속된 K개 찾으면,
             continue
         for _ in range(K, R):
-            que.popleft()
-            que.append(cov[r][c])
+            s += cov[r][c]
+            s -= cov[r-K][c]
             r += 1
 
-            if (not (0 in que and 1 in que)):  # 연속된 3개 찾으면,
+            if (s == 0 or s == K):  # 연속된 K개 찾으면,
                 find_from_col = True
                 continue
         if(not find_from_col):
