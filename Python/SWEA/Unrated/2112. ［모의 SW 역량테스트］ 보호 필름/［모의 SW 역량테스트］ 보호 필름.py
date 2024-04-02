@@ -44,14 +44,15 @@ for test_case in range(1, T + 1):
         cover.append(row)
         cover_init.append(row)
 
-    for k in range(K + 1):
-        comb_all.append(list(combinations(range(R), k)))
+    # for k in range(K + 1):
+    #     comb_all.append(list(combinations(range(R), k)))
 
 
     if(not check(cover)):
         answer = 99
 
-        for comb_by_num in comb_all:
+        for k in range(K + 1):
+            comb_by_num = list(combinations(range(R), k))
             # comb_by_num = [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5),,,]
             for cb in comb_by_num:
                 # 이전 커밋이랑 다른 점이, one가 빠짐 -> 2번째가 [0], 3번째가 [1], 4번째는 다시 [0]으로 바뀌는 경우가 최소일순 없음@!!
