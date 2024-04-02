@@ -8,6 +8,7 @@ max_val = 0
 
 def dfs(r, c, n, s):
     global answer
+    # 이런 방식으로 가망없는 경우들을 미리 제거해주는 게 포인트인가봄!!!! 
     if(n == 0 and s + max_val * 3 < answer):
         return 
     if(n == 1 and s + max_val * 2 < answer):
@@ -17,7 +18,7 @@ def dfs(r, c, n, s):
     if(n == 3):
         answer = max(answer, s)
         return
-        
+
     for d in dir:
         nr, nc = r + d[0], c + d[1]
         if(nr > 0 and nc > 0 and nr <= R and nc <= C and not visited[nr][nc]):
