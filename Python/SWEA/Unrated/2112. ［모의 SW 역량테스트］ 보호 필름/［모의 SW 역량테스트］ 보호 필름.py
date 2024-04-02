@@ -54,27 +54,15 @@ for test_case in range(1, T + 1):
         for comb_by_num in comb_all:
             # comb_by_num = [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5),,,]
             for cb in comb_by_num:
-                ones = []
-                for i in range(len(cb) + 1):
-                    l = list(combinations(cb, i))
-                    for ll in l:
-                        ones.append(ll)
-
-                for one in ones:
-                    for c in cb: # cb : (0, 1)
-                        if(c in one):
-                            cover[c] = [1 for _ in range(C)]
-                        else:
-                            cover[c] = [0 for _ in range(C)]
-
-                    if(check(cover)):
-                        answer = len(cb)
-                        break
-                    else:
-                        for c in cb:
-                            cover[c] = cover_init[c]
-                if (answer < 99):
-                    break
+                # 이전 커밋이랑 다른 점이, one가 빠짐 -> 2번째가 [0], 3번째가 [1], 4번째는 다시 [0]으로 바뀌는 경우가 최소일순 없음@!!
+                for i in range(2): 
+                    for c in cb:
+                        cover[c] = [i] * C;
+                        if(check(cover)):
+                            answer = len(cb)
+                            break
+                for c in cb:
+                    cover[c] = cover_init[c]
             if(answer < 99):
                 break
 
