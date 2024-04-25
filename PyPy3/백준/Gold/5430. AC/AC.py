@@ -33,18 +33,10 @@ def solve():
             else:
                 end -= 1
     
-    print('[', end="")
     if(dir):
-        while(start < end-1):
-            print(arr[start], end=',')
-            start += 1
-        print(arr[end-1], end=']')
+        print('['+','.join(map(str, arr[start:end]))+']')
     else:
-        while(end > start + 1):
-            end -= 1
-            print(arr[end], end=',')
-        print(arr[start], end=']') 
-    print()
+        print('['+','.join(map(str, reversed(arr[start:end])))+']')
 
 
 N = int(input())
