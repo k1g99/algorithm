@@ -39,13 +39,10 @@ int main(){
         }
         else if(cmd == "recommend"){
             cin >> X;
-            pair<int, int> target;
             if(X == 1){
-                target = make_pair(hardProb.begin()->first, hardProb.begin()->second);
-                cout << target.second << "\n";
+                cout << hardProb.begin()->second << "\n";
             }else{
-                target = make_pair(easyProb.begin()->first, easyProb.begin()->second);
-                cout << target.second << "\n";
+                cout << easyProb.begin()->second << "\n";
             }
         }else if(cmd == "solved"){
             // prob에서 문제, 난이도 찾고 지우기
